@@ -90,10 +90,36 @@ def main():
 
     bot.add_handler(CommandHandler("start", start))
     bot.add_handler(CommandHandler("consulta", consulta))
-
+    bot.add_handler(CommandHandler("plano", plano))
+  
     print("🤖 Bot iniciado!")
 
     bot.run_polling()
+
+async def plano(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not context.args:
+        await update.message.reply_text(
+            "❌ Informe o número.\n\n"
+            "Exemplo:\n"
+            "/plano 21999999999"
+        )
+        return
+
+    numero = re.sub(r"\D", "", context.args[0])
+
+    if len(numero) not in (10, 11):
+        await update.message.reply_text(
+            "❌ Número inválido.\n"
+            "Use DDD + número."
+        )
+        return
+
+    await update.message.reply_text(
+        "📦 Consulta de plano\n\n"
+        f"📞 Número: `{numero}`\n\n"
+        "ℹ️ A consulta de plano ainda precisa de uma API autorizada da operadora."
+    )
+
 
 
 if __name__ == "__main__":
