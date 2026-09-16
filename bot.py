@@ -1,3 +1,4 @@
+```python
 import os
 import re
 import requests
@@ -8,13 +9,16 @@ TELEGRAM_TOKEN = os.environ["TELEGRAM_TOKEN"]
 DIRECTCALL_TOKEN = os.environ["DIRECTCALL_TOKEN"]
 
 URL = "https://api.directcallsoft.com/portabilidade/consultar"
+ALGAR_URL = "https://apialgarzinha.shardweb.app/apialgar"
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "📱 CONSULTA DE OPERADORA\n\n"
         "Envie o número assim:\n"
-        "/consulta 21999999999"
+        "/consulta 21999999999\n\n"
+        "Para consultar Algar:\n"
+        "/algar 21850371881"
     )
 
 
@@ -112,6 +116,81 @@ async def plano(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def algar(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if not context.args:
+        await update.message.reply_text(
+            "❌ Informe o documento.\n\n"
+            "Exemplo:\n"
+            "/algar 21850371881"
+        )
+        return
+
+    documento = re.sub(r"\D", "", context.args[0])
+
+    if not documento:
+        await update.message.reply_text(
+            "❌ Documento inválido."
+        )
+        return
+
+    await update.message.reply_text(
+        "🔎 Consultando Algar..."
+    )
+
+    try:
+        resposta = requests.get(
+            ALGAR_URL,
+            params={"documento": documento},
+            timeout=20
+        )
+
+        resultado = resposta.json()
+
+    except Exception:
+        await update.message.reply_text(
+            "❌ Erro ao consultar a API Algar."
+        )
+        return
+
+    if not isinstance(resultado, dict):
+        await update.message.reply_text(
+            "❌ A API Algar retornou uma resposta inesperada."
+        )
+        return
+
+    resultados = resultado.get("results", [])
+
+    if not resultados:
+        await update.message.reply_text(
+            "❌ Nenhum resultado encontrado."
+        )
+        return
+
+    linhas = []
+
+    for item in resultados:
+        tipo = item.get("type", "Não informado")
+        valor = item.get("value", "Não informado")
+        method_id = item.get("method_id", "Não informado")
+
+        linhas.append(
+            f"📌 Tipo: `{tipo}`\n"
+            f"📄 Valor: `{valor}`\n"
+            f"🔑 Method ID: `{method_id}`"
+        )
+
+    mensagem = (
+        "📱 *CONSULTA ALGAR*\n\n"
+        + "\n\n".join(linhas)
+    )
+
+    await update.message.reply_text(
+        mensagem,
+        parse_mode="Markdown"
+    )
+
+
 def main():
 
     bot = Application.builder().token(TELEGRAM_TOKEN).build()
@@ -119,6 +198,7 @@ def main():
     bot.add_handler(CommandHandler("start", start))
     bot.add_handler(CommandHandler("consulta", consulta))
     bot.add_handler(CommandHandler("plano", plano))
+    bot.add_handler(CommandHandler("algar", algar))
 
     print("🤖 Bot iniciado!")
 
@@ -127,3 +207,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+```
