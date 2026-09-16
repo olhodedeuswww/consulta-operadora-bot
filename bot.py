@@ -2,22 +2,24 @@
 import os
 import re
 import requests
+
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
+
 
 TELEGRAM_TOKEN = os.environ["TELEGRAM_TOKEN"]
 DIRECTCALL_TOKEN = os.environ["DIRECTCALL_TOKEN"]
 
-URL = "https://api.directcallsoft.com/portabilidade/consultar"
+DIRECTCALL_URL = "https://api.directcallsoft.com/portabilidade/consultar"
 ALGAR_URL = "https://apialgarzinha.shardweb.app/apialgar"
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "📱 CONSULTA DE OPERADORA\n\n"
-        "Envie o número assim:\n"
+        "Use:\n"
         "/consulta 21999999999\n\n"
-        "Para consultar Algar:\n"
+        "🔎 Consulta Algar:\n"
         "/algar 21850371881"
     )
 
@@ -51,7 +53,7 @@ async def consulta(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         resposta = requests.post(
-            URL,
+            DIRECTCALL_URL,
             data=dados,
             timeout=20
         )
@@ -170,6 +172,7 @@ async def algar(update: Update, context: ContextTypes.DEFAULT_TYPE):
     linhas = []
 
     for item in resultados:
+
         tipo = item.get("type", "Não informado")
         valor = item.get("value", "Não informado")
         method_id = item.get("method_id", "Não informado")
