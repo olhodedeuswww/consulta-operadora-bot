@@ -30,7 +30,6 @@ async def consulta(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     numero = re.sub(r"\D", "", context.args[0])
 
-  
     if len(numero) not in (10, 11):
         await update.message.reply_text(
             "❌ Número inválido.\n"
@@ -69,12 +68,14 @@ async def consulta(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     numero_api = resultado.get("NUMERO", numero)
     origem = resultado.get("OPERADORA_ORIGEM", "Não informado")
+    atual = resultado.get("OPERADORA_ATUAL", "Não informado")
     migracao = resultado.get("DATA_MIGRACAO", "Não informado")
 
     mensagem = (
         "📱 *RESULTADO DA CONSULTA*\n\n"
         f"📞 Número: `{numero_api}`\n"
         f"📡 Operadora de origem: *{origem}*\n"
+        f"📡 Operadora atual: *{atual}*\n"
         f"🔄 Data de migração: `{migracao or 'Não informado'}`"
     )
 
@@ -84,19 +85,8 @@ async def consulta(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-def main():
-
-    bot = Application.builder().token(TELEGRAM_TOKEN).build()
-
-    bot.add_handler(CommandHandler("start", start))
-    bot.add_handler(CommandHandler("consulta", consulta))
-    bot.add_handler(CommandHandler("plano", plano))
-  
-    print("🤖 Bot iniciado!")
-
-    bot.run_polling()
-
 async def plano(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     if not context.args:
         await update.message.reply_text(
             "❌ Informe o número.\n\n"
@@ -115,11 +105,24 @@ async def plano(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     await update.message.reply_text(
-        "📦 Consulta de plano\n\n"
+        "📦 *CONSULTA DE PLANO*\n\n"
         f"📞 Número: `{numero}`\n\n"
-        "ℹ️ A consulta de plano ainda precisa de uma API autorizada da operadora."
+        "ℹ️ A consulta do plano comercial "
+        "depende de uma API autorizada da operadora."
     )
 
+
+def main():
+
+    bot = Application.builder().token(TELEGRAM_TOKEN).build()
+
+    bot.add_handler(CommandHandler("start", start))
+    bot.add_handler(CommandHandler("consulta", consulta))
+    bot.add_handler(CommandHandler("plano", plano))
+
+    print("🤖 Bot iniciado!")
+
+    bot.run_polling()
 
 
 if __name__ == "__main__":
