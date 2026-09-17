@@ -1,16 +1,25 @@
+```python
 import os
 import re
 import requests
+<<<<<<< HEAD
+=======
 import io
 import urllib.parse
+>>>>>>> 94777e9 (salva bot atual)
 
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
+
 TELEGRAM_TOKEN = os.environ["TELEGRAM_TOKEN"]
 DIRECTCALL_TOKEN = os.environ["DIRECTCALL_TOKEN"]
+<<<<<<< HEAD
+
+=======
 IMEI_API_KEY = os.environ["IMEI_API_KEY"]
 IMEIAPI_KEY = os.environ["IMEIAPI_KEY"].strip()
+>>>>>>> 94777e9 (salva bot atual)
 DIRECTCALL_URL = "https://api.directcallsoft.com/portabilidade/consultar"
 ALGAR_URL = "https://apialgarzinha.shardweb.app/apialgar"
 
@@ -53,7 +62,11 @@ async def consulta(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         resposta = requests.post(
             DIRECTCALL_URL,
+<<<<<<< HEAD
+            data=dados,
+=======
             Data=dados,
+>>>>>>> 94777e9 (salva bot atual)
             timeout=20
         )
         resultado = resposta.json()
@@ -110,6 +123,10 @@ async def plano(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def algar(update: Update, context: ContextTypes.DEFAULT_TYPE):
+<<<<<<< HEAD
+
+=======
+>>>>>>> 94777e9 (salva bot atual)
     if not context.args:
         await update.message.reply_text(
             "❌ Informe o documento.\n\n"
@@ -117,6 +134,77 @@ async def algar(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/algar 21850371881"
         )
         return
+<<<<<<< HEAD
+
+    documento = re.sub(r"\D", "", context.args[0])
+
+    if not documento:
+        await update.message.reply_text(
+            "❌ Documento inválido."
+        )
+        return
+
+    await update.message.reply_text(
+        "🔎 Consultando Algar..."
+    )
+
+    try:
+        resposta = requests.get(
+            ALGAR_URL,
+            params={"documento": documento},
+            timeout=20
+        )
+
+        resultado = resposta.json()
+
+    except Exception:
+        await update.message.reply_text(
+            "❌ Erro ao consultar a API Algar."
+        )
+        return
+
+    if not isinstance(resultado, dict):
+        await update.message.reply_text(
+            "❌ A API Algar retornou uma resposta inesperada."
+        )
+        return
+
+    resultados = resultado.get("results", [])
+
+    if not resultados:
+        await update.message.reply_text(
+            "❌ Nenhum resultado encontrado."
+        )
+        return
+
+    linhas = []
+
+    for item in resultados:
+
+        tipo = item.get("type", "Não informado")
+        valor = item.get("value", "Não informado")
+        method_id = item.get("method_id", "Não informado")
+
+        linhas.append(
+            f"📌 Tipo: `{tipo}`\n"
+            f"📄 Valor: `{valor}`\n"
+            f"🔑 Method ID: `{method_id}`"
+        )
+
+    mensagem = (
+        "📱 *CONSULTA ALGAR*\n\n"
+        + "\n\n".join(linhas)
+    )
+
+    await update.message.reply_text(
+        mensagem,
+        parse_mode="Markdown"
+    )
+
+
+def main():
+=======
+>>>>>>> 94777e9 (salva bot atual)
 
     documento = re.sub(r"\D", "", context.args[0])
 
@@ -209,11 +297,16 @@ def main():
     bot.add_handler(CommandHandler("consulta", consulta))
     bot.add_handler(CommandHandler("plano", plano))
     bot.add_handler(CommandHandler("algar", algar))
+<<<<<<< HEAD
+
+=======
     bot.add_handler(CommandHandler("imei", imei))
    
+>>>>>>> 94777e9 (salva bot atual)
     print("🤖 Bot iniciado!")
     bot.run_polling()
 
 
 if __name__ == "__main__":
     main()
+```
